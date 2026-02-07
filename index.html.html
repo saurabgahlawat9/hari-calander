@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hari Calendar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+    padding: 16px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .year {
+    text-align: center;
+    margin-bottom: 10px;
+    opacity: 0.9;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .controls button,
+  .controls input {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .controls button {
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .controls input {
+    width: 90px;
+  }
+
+  .month {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .weekday {
+    text-align: center;
+    font-weight: bold;
+    padding: 6px 0;
+    font-size: 0.8rem;
+    opacity: 0.9;
+  }
+
+  .day {
+    background: #fff;
+    color: #333;
+    text-align: center;
+    padding: 12px 0;
+    border-radius: 10px;
+  }
+
+  .extra {
+    background: #ffdd99;
+    font-weight: bold;
+  }
+
+  .today {
+    background: #ff5252;
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 0 0 2px #fff inset;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<h1>Hari Calendar</h1>
+<div class="year" id="yearDisplay"></div>
+
+<div class="controls">
+  <button onclick="prevMonth()">◀</button>
+  <input type="number" id="yearInput" placeholder="Year" min="1900" onchange="jumpYear()">
+  <button onclick="nextMonth()">▶</button>
+</div>
+
+<div class="month" id="monthName"></div>
+
+<div class="calendar">
+  <div class="weekday">Sun</div>
+  <div class="weekday">Mon</div>
+  <div class="weekday">Tue</div>
+  <div class="weekday">Wed</div>
+  <div class="weekday">Thu</div>
+  <div class="weekday">Fri</div>
+  <div class="weekday">Sat</div>
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+</div>
+
+<script>
+const months = [
+  "Alpha","Beta","Gama","Charlie","Bravo","Delta",
+  "Aurora","Cinder","Dawn","Frost","Horizon","Zenith","Karma"
+];
+
+let currentMonth = 0;
+let currentYear = 1900;
+
+/* ---- TODAY CALCULATION ---- */
+const startDate = new Date(1900, 0, 1);
+const todayDate = new Date();
+const diffDays = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
+
+const hariYear = 1900 + Math.floor(diffDays / 365);
+const dayOfYear = diffDays % 365;
+const hariMonth = Math.min(12, Math.floor(dayOfYear / 28));
+const hariDay = dayOfYear % 28 + 1;
+const isIonToday = (hariMonth === 12 && dayOfYear === 364);
+
+function showCalendar() {
+  document.getElementById("monthName").innerText = months[currentMonth];
+  document.getElementById("yearDisplay").innerText = "Year " + currentYear + " AD";
+
+  const calendar = document.getElementById("calendar");
+  calendar.innerHTML = "";
+
+  for (let d = 1; d <= 28; d++) {
+    const div = document.createElement("div");
+    div.className = "day";
+    div.innerText = d;
+
+    if (
+      currentYear === hariYear &&
+      currentMonth === hariMonth &&
+      d === hariDay &&
+      !isIonToday
+    ) {
+      div.classList.add("today");
+    }
+
+    calendar.appendChild(div);
+  }
+
+  if (currentMonth === 12) {
+    const ion = document.createElement("div");
+    ion.className = "day extra";
+    ion.innerText = "Ion";
+
+    if (currentYear === hariYear && isIonToday) {
+      ion.classList.add("today");
+    }
+
+    calendar.appendChild(ion);
+  }
+}
+
+function nextMonth() {
+  currentMonth++;
+  if (currentMonth === 13) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  showCalendar();
+}
+
+function prevMonth() {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 12;
+    currentYear--;
+  }
+  showCalendar();
+}
+
+function jumpYear() {
+  const y = document.getElementById("yearInput").value;
+  if (y >= 1900) {
+    currentYear = parseInt(y);
+    showCalendar();
+  }
+}
+
+showCalendar();
+</script>
+
+</body>
+</html>
